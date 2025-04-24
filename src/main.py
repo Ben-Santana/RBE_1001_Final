@@ -17,11 +17,14 @@ ON_LINE_VAL = 10 # Reflectivity detected from line trackers when they are fully 
 TURN_SPEED = 100 # Speed of motors when turning
 TURN_MARGIN = 5 # Margin to check if reached target angle when turning
 
+ROLLER_SPEED = 120 # Speed of roller that picks up fruit
+
 # ================= Hardware ================= #
 
 brain=Brain()
-left_motor = Motor(Ports.PORT10, 18_1, True)
-right_motor = Motor(Ports.PORT1, 18_1, False)
+left_motor = Motor(Ports.PORT1, 18_1, True)
+right_motor = Motor(Ports.PORT10, 18_1, False)
+roller_motor = Motor(Ports.PORT2, 18_1, True)
 inertial_sensor = Inertial(Ports.PORT5)
 left_line_tracker = Line(brain.three_wire_port.a)
 right_line_tracker = Line(brain.three_wire_port.b)
@@ -34,10 +37,18 @@ def stopMotors():
     left_motor.stop()
     right_motor.stop()
 
-def drive(speed, direction):
+def startRoller():
+    roller_motor.set_velocity(ROLLER_SPEED)
+    roller_motor.spin(FORWARD)
 
-    # Drive the robot with specified speed and direction.
-    # Negative direction turns right, positive turns left.
+def stopRoller():
+    roller_motor.stop()
+
+def drive(speed, direction):
+    '''
+    Drive the robot with specified speed and direction.
+    Negative direction turns right, positive turns left.
+    '''
     left_motor.set_velocity(speed - direction, RPM)
     right_motor.set_velocity(speed + direction, RPM)
     left_motor.spin(FORWARD)
@@ -142,11 +153,16 @@ def turn(target_angle: int, direction: TurnType.TurnType):
 
 # ================= Detection ================= #
 
+#TODO:
 def seesTag():
     # returns whether the camera sees an april tag
     objs = camera.take_snapshot(Tagdesc(0xFFFF))
     print(camera.largest_object())
     return False
+
+#TODO:
+def getClosestAprilTag(id):
+    pass
 
 #TODO:
 def findFruit(color):
@@ -263,4 +279,48 @@ def main():
     # ?! SUCCESS ?! #
 
 
-main()
+
+# ================= Tests ================= #
+
+def test_shake():
+    shake(6, 3, 2, 100)
+
+def test_pickUpFruit():
+    pickUpThreeFruit("green")
+
+#TODO:
+def testSimpleNavigation():
+    '''
+    Goes around orchard, doesn't pick fruit, doesn't drop
+    '''
+#TODO:
+def testDropNavigation():
+    '''
+    Goes around orchard, simulates dropping fruit at each bin
+    '''
+
+#TODO:
+def testShakeNavigation():
+    '''
+    Goes up ramp, shakes first tree
+    '''
+
+#TODO:
+def test_approachAprilTag():
+    pass
+
+#TODO:
+def testLine_approachAprilTag():
+    pass
+
+
+#TODO:
+def test_close_arm():
+    pass
+
+# Ideas: 
+#   Make a calibration system, add a button, and set the robot at spots next to bins, log distance and x y position in camera, match that when doing the run
+# 
+
+test_close_arm()
+test_shake()
